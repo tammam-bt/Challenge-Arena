@@ -4,17 +4,6 @@
 
 A fun and interactive console-based platform for students to solve algorithmic challenges, learn programming concepts, and compete with peers through a global leaderboard system.
 
-## 📋 Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Challenges](#challenges)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Scoring System](#scoring-system)
-- [File Structure](#file-structure)
-- [Technologies](#technologies)
-- [Author](#author)
-
 ## 🎯 Overview
 
 This project is designed to help students:
