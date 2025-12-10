@@ -451,6 +451,126 @@ void challenge_compte_bon() {
     pause_screen();
 }
 
+/*
+================================================================================
+    CHALLENGE 2: MASTERMIND ALGORITHMIQUE
+    Guess the secret sequence with feedback on correct/misplaced digits
+================================================================================
+*/
+
+void challenge_mastermind() {
+    clear_screen();
+    display_header("CHALLENGE 2: Mastermind Algorithmique");
+    
+    printf("🎯 Objective: Guess the secret 4-digit sequence (digits 1-6)\n");
+    printf("   After each guess, you'll get feedback for each position:\n");
+    printf("   • ✓ = Correct digit in correct position\n");
+    printf("   • ? = Correct digit in wrong position\n");
+    printf("   • x = Wrong digit\n\n");
+    
+    // Generate secret sequence
+    int secret[4];
+    for(int i = 0; i < 4; i++) {
+        secret[i] = (rand() % 6) + 1;
+    }
+    
+    int attempts = 0;
+    int max_attempts = 10;
+    int won = 0;
+    
+    while(attempts < max_attempts && !won) {
+        printf("\nAttempt %d/%d\n", attempts + 1, max_attempts);
+        printf("Enter 4 digits (1-6): ");
+        
+        int guess[4];
+        char input[10];
+        fgets(input, sizeof(input), stdin);
+        
+        if (sscanf(input, "%d %d %d %d", &guess[0], &guess[1], &guess[2], &guess[3]) != 4) {
+            printf("❌ Invalid input! Please enter 4 numbers separated by spaces.\n");
+            continue;
+        }
+        
+        attempts++;
+        
+        // Generate feedback for each position
+        char feedback[4];
+        int secret_used[4] = {0};
+        int guess_used[4] = {0};
+        
+        // First pass: mark exact matches
+        for(int i = 0; i < 4; i++) {
+            if (guess[i] == secret[i]) {
+                feedback[i] = 'v'; // correct position
+                secret_used[i] = 1;
+                guess_used[i] = 1;
+            } else {
+                feedback[i] = 'x'; // default to wrong
+            }
+        }
+        
+        // Second pass: find correct digits in wrong positions
+        for(int i = 0; i < 4; i++) {
+            if (!guess_used[i]) {
+                for(int j = 0; j < 4; j++) {
+                    if (!secret_used[j] && guess[i] == secret[j]) {
+                        feedback[i] = '?'; // correct digit, wrong position
+                        secret_used[j] = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Display feedback per position
+        printf("Feedback: ");
+        for(int i = 0; i < 4; i++) {
+            if (feedback[i] == 'v') printf("✓ ");
+            else if (feedback[i] == '?') printf("? ");
+            else printf("x ");
+        }
+        printf("\n");
+        
+        // Check win condition
+        won = 1;
+        for(int i = 0; i < 4; i++) {
+            if (feedback[i] != 'v') {
+                won = 0;
+                break;
+            }
+        }
+    }
+    
+    if (won) {
+        // Score based on number of attempts (fewer is better)
+        int score = POINTS_MASTERMIND - (attempts - 1) * 2;
+        if (score < 5) score = 5;
+        
+        printf("\n✅ Congratulations! You cracked the code!\n");
+        printf("🎯 Attempts: %d\n", attempts);
+        printf("🎯 Score earned: %d points\n", score);
+        
+        if (current_player.mastermind_score == 0) {
+            current_player.challenges_completed++;
+        }
+        
+        if (score > current_player.mastermind_score) {
+            current_player.total_score = current_player.total_score - current_player.mastermind_score + score;
+            current_player.mastermind_score = score;
+            save_player_scores(&current_player);
+            printf("🏆 New personal best!\n");
+        }
+    } else {
+        printf("\n❌ Out of attempts! The secret was: ");
+        for(int i = 0; i < 4; i++) printf("%d ", secret[i]);
+        printf("\n");
+    }
+    
+    pause_screen();
+}
+
+
+
 
 /*
 ================================================================================
