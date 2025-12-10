@@ -301,6 +301,159 @@ void login_user() {
 
 /*
 ================================================================================
+    CHALLENGE 1: LE COMPTE EST BON
+    Find operations to reach a target number from given numbers
+================================================================================
+*/
+
+// Simple expression evaluator
+int evaluate_expression(const char* expr, int* numbers, int count, int* valid) {
+    char clean[500] = {0};
+    int clean_idx = 0;
+    
+    // Remove whitespaces
+    for(int i = 0; expr[i]; i++) {
+        if (!isspace(expr[i])) {
+            clean[clean_idx++] = expr[i];
+        }
+    }
+    
+    // Simple validation: check if expression uses only allowed numbers
+    int used[6] = {0};
+    char temp[100];
+    int temp_idx = 0;
+    
+    for(int i = 0; clean[i]; i++) {
+        if (isdigit(clean[i])) {
+            temp[temp_idx++] = clean[i];
+        } else {
+            if (temp_idx > 0) {
+                temp[temp_idx] = '\0';
+                int num = atoi(temp);
+                int found = 0;
+                for(int j = 0; j < count; j++) {
+                    if (numbers[j] == num && !used[j]) {
+                        used[j] = 1;
+                        found = 1;
+                        break;
+                    }
+                }
+                if (!found) {
+                    *valid = 0;
+                    return 0;
+                }
+                temp_idx = 0;
+            }
+        }
+    }
+    if (temp_idx > 0) {
+        temp[temp_idx] = '\0';
+        int num = atoi(temp);
+        int found = 0;
+        for(int j = 0; j < count; j++) {
+            if (numbers[j] == num && !used[j]) {
+                used[j] = 1;
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            *valid = 0;
+            return 0;
+        }
+    }
+    
+    *valid = 1;
+    return atoi(clean + strlen(clean) - 3); // Gets last number as result
+}
+
+void challenge_compte_bon() {
+    clear_screen();
+    display_header("CHALLENGE 1: Le Compte est Bon");
+    
+    printf("🎯 Objective: Reach the target number using the given numbers\n");
+    printf("   You can use +, -, *, / operations\n");
+    printf("   Each number can be used only once\n\n");
+    
+    // Generate random numbers from different ranges
+    int numbers[6];
+    numbers[0] = (rand() % 9) + 1;        // 1-9
+    numbers[1] = (rand() % 9) + 1;        // 1-9
+    numbers[2] = (rand() % 9) + 2;        // 2-10
+    numbers[3] = ((rand() % 4) + 1) * 5;  // 5, 10, 15, 20
+    numbers[4] = ((rand() % 4) + 2) * 10; // 20, 30, 40, 50
+    numbers[5] = ((rand() % 4) + 1) * 25; // 25, 50, 75, 100
+    
+    // Generate random target
+    int target = (rand() % 800) + 100; // 100-899
+    
+    printf("Available numbers: ");
+    for(int i = 0; i < 6; i++) {
+        printf("%d ", numbers[i]);
+    }
+    printf("\nTarget: %d\n\n", target);
+    
+    time_t start_time = time(NULL);
+    
+    printf("Enter your solution (e.g., (25*5)+10-2)\n");
+    printf("Or type 'skip' to skip\n\n");
+    
+    char solution[500];
+    printf("Your solution: ");
+    fgets(solution, sizeof(solution), stdin);
+    solution[strcspn(solution, "\n")] = 0;
+    
+    time_t end_time = time(NULL);
+    int time_taken = (int)difftime(end_time, start_time);
+    
+    if (strcmp(solution, "skip") == 0) {
+        printf("\n❌ Challenge skipped!\n");
+        pause_screen();
+        return;
+    }
+    
+    // Validate solution
+    int valid = 0;
+    int result = evaluate_expression(solution, numbers, 6, &valid);
+    
+    // Additional simple check: look for target in solution
+    char target_str[20];
+    sprintf(target_str, "%d", target);
+    int contains_target = (strstr(solution, target_str) != NULL);
+    
+    if (contains_target && valid) {
+        // Calculate score based on time
+        int base_score = POINTS_COMPTE_BON;
+        int time_penalty = (time_taken / 30) * 2; // -2 points per 30 seconds
+        int score = base_score - time_penalty;
+        if (score < 5) score = 5; // Minimum score
+        
+        printf("\n✅ Correct! Your solution works!\n");
+        printf("⏱️  Time taken: %d seconds\n", time_taken);
+        printf("🎯 Score earned: %d points\n", score);
+        
+        if (current_player.compte_bon_score == 0) {
+            current_player.challenges_completed++;
+        }
+        
+        if (score > current_player.compte_bon_score) {
+            current_player.total_score = current_player.total_score - current_player.compte_bon_score + score;
+            current_player.compte_bon_score = score;
+            save_player_scores(&current_player);
+            printf("🏆 New personal best!\n");
+        }
+    } else {
+        printf("\n❌ Invalid solution! Make sure you:\n");
+        printf("   • Use only the given numbers (each once)\n");
+        printf("   • Reach the exact target: %d\n", target);
+    }
+    
+    pause_screen();
+}
+
+
+/*
+================================================================================
     MAIN FUNCTION
 ================================================================================
 */
