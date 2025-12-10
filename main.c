@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #ifdef _WIN32
-#include <windows.h>
+    #include <windows.h>
 #endif
 #include <ctype.h>
 
@@ -569,7 +569,6 @@ void challenge_mastermind() {
     pause_screen();
 }
 
-
 /*
 ================================================================================
     CHALLENGE 3: COURSE DE ROBOTS
@@ -742,7 +741,6 @@ void challenge_course_robots() {
     pause_screen();
 }
 
-
 /*
 ================================================================================
     CHALLENGE 4: TRI ULTIME
@@ -851,7 +849,6 @@ void challenge_tri_ultime() {
     
     pause_screen();
 }
-
 
 /*
 ================================================================================
@@ -995,6 +992,118 @@ void challenge_tour_hanoi() {
     pause_screen();
 }
 
+/*
+================================================================================
+    LEADERBOARD AND STATISTICS
+================================================================================
+*/
+
+void display_leaderboard() {
+    clear_screen();
+    display_header("🏆 GLOBAL LEADERBOARD 🏆");
+    
+    FILE* file = fopen(SCORES_FILE, "r");
+    if (!file) {
+        printf("No scores recorded yet!\n");
+        pause_screen();
+        return;
+    }
+    
+    Player players[MAX_PLAYERS];
+    int count = 0;
+    
+    char name[MAX_NAME_LENGTH];
+    int cb, mm, rb, tr, hn, tot, comp;
+    
+    while (fscanf(file, "%[^,],%d,%d,%d,%d,%d,%d,%d\n",
+                  name, &cb, &mm, &rb, &tr, &hn, &tot, &comp) == 8 && count < MAX_PLAYERS) {
+        strcpy(players[count].name, name);
+        players[count].total_score = tot;
+        players[count].challenges_completed = comp;
+        count++;
+    }
+    fclose(file);
+    
+    // Sort by total score
+    for(int i = 0; i < count - 1; i++) {
+        for(int j = 0; j < count - i - 1; j++) {
+            if (players[j].total_score < players[j+1].total_score) {
+                Player temp = players[j];
+                players[j] = players[j+1];
+                players[j+1] = temp;
+            }
+        }
+    }
+    
+    printf("╔════╦══════════════════════════╦══════════════╦════════════════════╗\n");
+    printf("║ #  ║ Player Name              ║ Total Score  ║ Challenges Done    ║\n");
+    printf("╠════╬══════════════════════════╬══════════════╬════════════════════╣\n");
+    
+    for(int i = 0; i < count && i < 10; i++) {
+        printf("║ %-2d ║ %-24s ║ %-12d ║ %-18d ║\n",
+               i + 1, players[i].name, players[i].total_score, players[i].challenges_completed);
+    }
+    
+    printf("╚════╩══════════════════════════╩══════════════╩════════════════════╝\n");
+    
+    pause_screen();
+}
+
+void display_player_stats() {
+    clear_screen();
+    display_header("📊 YOUR STATISTICS 📊");
+    
+    printf("Player: %s\n\n", current_player.name);
+    
+    printf("╔══════════════════════════════════╦═══════════╦════════════╗\n");
+    printf("║ Challenge                        ║ Score     ║ Max Points ║\n");
+    printf("╠══════════════════════════════════╬═══════════╬════════════╣\n");
+    printf("║ 1. Le Compte est Bon             ║ %-9d ║ %-10d ║\n", current_player.compte_bon_score, POINTS_COMPTE_BON);
+    printf("║ 2. Mastermind Algorithmique      ║ %-9d ║ %-10d ║\n", current_player.mastermind_score, POINTS_MASTERMIND);
+    printf("║ 3. Course de Robots              ║ %-9d ║ %-10d ║\n", current_player.robot_score, POINTS_ROBOT);
+    printf("║ 4. Tri Ultime                    ║ %-9d ║ %-10d ║\n", current_player.tri_score, POINTS_TRI);
+    printf("║ 5. Tour de Hanoi                 ║ %-9d ║ %-10d ║\n", current_player.hanoi_score, POINTS_HANOI);
+    printf("╠══════════════════════════════════╬═══════════╬════════════╣\n");
+    printf("║ TOTAL                            ║ %-9d ║ %-10d ║\n", current_player.total_score, POINTS_COMPTE_BON + POINTS_MASTERMIND + POINTS_ROBOT + POINTS_TRI + POINTS_HANOI);
+    printf("╚══════════════════════════════════╩═══════════╩════════════╝\n");
+    
+    printf("\n📈 Challenges Completed: %d/5\n", current_player.challenges_completed);
+    
+    float completion = (current_player.challenges_completed / 5.0) * 100;
+    printf("📊 Completion Rate: %.1f%%\n", completion);
+    
+    pause_screen();
+}
+
+/*
+================================================================================
+    MAIN MENU
+================================================================================
+*/
+
+void display_main_menu() {
+    clear_screen();
+    display_banner();
+    
+    printf("  ╔═══════════════════════════════════════════════════════════════════╗\n");
+    printf("  ║                         🎮 MAIN MENU 🎮                           ║\n");
+    printf("  ╠═══════════════════════════════════════════════════════════════════╣\n");
+    printf("  ║                                                                   ║\n");
+    printf("  ║   1. 🎯 Le Compte est Bon              (Difficulty: ⭐⭐⭐ - 30pts)  ║\n");
+    printf("  ║   2. 🧩 Mastermind Algorithmique       (Difficulty: ⭐⭐⭐ - 25pts)  ║\n");
+    printf("  ║   3. 🤖 Course de Robots               (Difficulty: ⭐⭐⭐⭐⭐ - 50pts)║\n");
+    printf("  ║   4. 📊 Tri Ultime                     (Difficulty: ⭐⭐ - 20pts)    ║\n");
+    printf("  ║   5. 🗼 Tour de Hanoi                  (Difficulty: ⭐⭐⭐⭐ - 40pts)  ║\n");
+    printf("  ║                                                                   ║\n");
+    printf("  ║   6. 🏆 View Leaderboard                                          ║\n");
+    printf("  ║   7. 📊 View Your Statistics                                      ║\n");
+    printf("  ║   8. 🚪 Exit                                                      ║\n");
+    printf("  ║                                                                   ║\n");
+    printf("  ╚═══════════════════════════════════════════════════════════════════╝\n\n");
+    
+    printf("  Player: %s | Total Score: %d | Completed: %d/5\n\n",
+           current_player.name, current_player.total_score, current_player.challenges_completed);
+}
 
 /*
 ================================================================================
@@ -1025,25 +1134,25 @@ int main() {
         
         switch(choice) {
             case CHALLENGE_COMPTE_BON:
-                //challenge_compte_bon();
+                challenge_compte_bon();
                 break;
             case CHALLENGE_MASTERMIND:
-                // challenge_mastermind();
+                challenge_mastermind();
                 break;
             case CHALLENGE_ROBOT:
-                // challenge_course_robots();
+                challenge_course_robots();
                 break;
             case CHALLENGE_TRI:
-                // challenge_tri_ultime();
+                challenge_tri_ultime();
                 break;
             case CHALLENGE_HANOI:
-                // challenge_tour_hanoi();
+                challenge_tour_hanoi();
                 break;
             case VIEW_LEADERBOARD:
-                // display_leaderboard();
+                display_leaderboard();
                 break;
             case VIEW_STATS:
-                // display_player_stats();
+                display_player_stats();
                 break;
             case EXIT:
                 printf("\n  Thanks for playing, %s! Keep coding! 🚀\n\n", current_player.name);
