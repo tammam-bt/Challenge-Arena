@@ -570,6 +570,177 @@ void challenge_mastermind() {
 }
 
 
+/*
+================================================================================
+    CHALLENGE 3: COURSE DE ROBOTS
+    Find the shortest path through a maze
+================================================================================
+*/
+
+void display_maze(char maze[MAZE_SIZE][MAZE_SIZE]) {
+    printf("\n  ");
+    for(int i = 0; i < MAZE_SIZE; i++) printf("%d ", i);
+    printf("\n");
+    
+    for(int i = 0; i < MAZE_SIZE; i++) {
+        printf("%d ", i);
+        for(int j = 0; j < MAZE_SIZE; j++) {
+            printf("%c ", maze[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int is_valid_move(int x, int y, char maze[MAZE_SIZE][MAZE_SIZE], int visited[MAZE_SIZE][MAZE_SIZE]) {
+    return (x >= 0 && x < MAZE_SIZE && y >= 0 && y < MAZE_SIZE &&
+            maze[x][y] != WALL && !visited[x][y]);
+}
+
+void challenge_course_robots() {
+    clear_screen();
+    display_header("CHALLENGE 3: Course de Robots");
+    
+    printf("🎯 Objective: Find the shortest path from S to E\n");
+    printf("   Commands: N (North/Up), S (South/Down), E (East/Right), O (West/Left)\n\n");
+    
+    // Predefined mazes with unique solutions
+    char mazes[4][MAZE_SIZE][MAZE_SIZE] = {
+        // Maze 1 - Optimal: 18 steps
+        {
+            {START, '.', '.', '#', '.', '.', '.', '#', '.', '.'},
+            {'#', '#', '.', '#', '.', '#', '.', '#', '.', '#'},
+            {'.', '.', '.', '.', '.', '#', '.', '.', '.', '.'},
+            {'.', '#', '#', '#', '.', '#', '#', '#', '.', '#'},
+            {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.'},
+            {'#', '#', '.', '#', '#', '#', '.', '#', '#', '.'},
+            {'.', '.', '.', '.', '.', '.', '.', '#', '.', '.'},
+            {'.', '#', '#', '#', '.', '#', '.', '#', '.', '#'},
+            {'.', '.', '.', '#', '.', '.', '.', '.', '.', END},
+            {'#', '#', '.', '#', '#', '#', '#', '#', '.', '#'}
+        },
+        // Maze 2 - Optimal: 20 steps
+        {
+            {START, '.', '#', '.', '.', '.', '#', '.', '.', '.'},
+            {'.', '.', '#', '.', '#', '.', '#', '.', '#', '.'},
+            {'#', '.', '.', '.', '#', '.', '.', '.', '#', '.'},
+            {'#', '#', '#', '.', '#', '#', '#', '.', '#', '.'},
+            {'.', '.', '.', '.', '.', '.', '.', '.', '.', '.'},
+            {'.', '#', '#', '#', '.', '#', '#', '#', '#', '#'},
+            {'.', '.', '.', '#', '.', '.', '.', '.', '.', '.'},
+            {'#', '#', '.', '#', '#', '#', '.', '#', '#', '.'},
+            {'.', '.', '.', '.', '.', '#', '.', '.', '.', END},
+            {'.', '#', '#', '#', '.', '#', '#', '#', '.', '#'}
+        },
+        // Maze 3 - Optimal: 22 steps
+        {
+            {START, '.', '.', '.', '#', '.', '.', '.', '.', '.'},
+            {'#', '#', '#', '.', '#', '.', '#', '#', '#', '.'},
+            {'.', '.', '.', '.', '.', '.', '.', '.', '#', '.'},
+            {'.', '#', '#', '#', '#', '#', '#', '.', '#', '.'},
+            {'.', '.', '.', '.', '.', '.', '.', '.', '#', '.'},
+            {'#', '#', '#', '.', '#', '#', '#', '.', '#', '.'},
+            {'.', '.', '#', '.', '.', '.', '#', '.', '.', '.'},
+            {'.', '.', '#', '#', '#', '.', '#', '#', '#', '#'},
+            {'.', '.', '.', '.', '#', '.', '.', '.', '.', END},
+            {'#', '#', '#', '.', '#', '#', '#', '#', '.', '#'}
+        },
+        // Maze 4 - Optimal: 24 steps
+        {
+            {START, '.', '#', '.', '.', '.', '.', '#', '.', '.'},
+            {'.', '.', '#', '#', '#', '#', '.', '#', '.', '#'},
+            {'.', '.', '.', '.', '.', '#', '.', '.', '.', '#'},
+            {'#', '#', '#', '#', '.', '#', '.', '#', '.', '#'},
+            {'.', '.', '.', '.', '.', '.', '.', '#', '.', '.'},
+            {'.', '#', '#', '#', '#', '#', '.', '#', '#', '.'},
+            {'.', '.', '.', '.', '.', '#', '.', '.', '.', '.'},
+            {'#', '#', '#', '.', '.', '#', '#', '#', '.', '#'},
+            {'.', '.', '#', '.', '.', '.', '.', '#', '.', END},
+            {'.', '.', '#', '#', '#', '#', '.', '#', '.', '#'}
+        }
+    };
+    
+    int optimal_paths[4] = {18, 20, 22, 24};
+    
+    // Randomly select a maze
+    int maze_idx = rand() % 4;
+    char maze[MAZE_SIZE][MAZE_SIZE];
+    for(int i = 0; i < MAZE_SIZE; i++) {
+        for(int j = 0; j < MAZE_SIZE; j++) {
+            maze[i][j] = mazes[maze_idx][i][j];
+        }
+    }
+    int optimal_path = optimal_paths[maze_idx];
+    
+    display_maze(maze);
+    
+    printf("\nEnter your path (e.g., SSEEENNNEE) or 'skip': ");
+    char path[MAX_PATH_LENGTH];
+    fgets(path, sizeof(path), stdin);
+    path[strcspn(path, "\n")] = 0;
+    
+    if (strcmp(path, "skip") == 0) {
+        printf("\n❌ Challenge skipped!\n");
+        pause_screen();
+        return;
+    }
+    
+    // Simulate the path
+    int x = 0, y = 0; // Start position
+    int valid = 1;
+    int steps = strlen(path);
+    
+    for(int i = 0; i < steps && valid; i++) {
+        char move = toupper(path[i]);
+        int new_x = x, new_y = y;
+        
+        switch(move) {
+            case 'N': new_x--; break;
+            case 'S': new_x++; break;
+            case 'E': new_y++; break;
+            case 'O': new_y--; break;
+            default: valid = 0; break;
+        }
+        
+        if (new_x < 0 || new_x >= MAZE_SIZE || new_y < 0 || new_y >= MAZE_SIZE ||
+            maze[new_x][new_y] == WALL) {
+            valid = 0;
+        } else {
+            x = new_x;
+            y = new_y;
+            if (maze[x][y] != START && maze[x][y] != END) {
+                maze[x][y] = PATH;
+            }
+        }
+    }
+    
+    if (valid && x == 9 && y == 9) {
+        printf("\n✅ You reached the end!\n");
+        display_maze(maze);
+        
+        // Score based on path length (shorter is better)
+        int score = POINTS_ROBOT - (steps - optimal_path);
+        if (score < 10) score = 10;
+        
+        printf("\n🎯 Path length: %d steps\n", steps);
+        printf("🎯 Score earned: %d points\n", score);
+        
+        if (current_player.robot_score == 0) {
+            current_player.challenges_completed++;
+        }
+        
+        if (score > current_player.robot_score) {
+            current_player.total_score = current_player.total_score - current_player.robot_score + score;
+            current_player.robot_score = score;
+            save_player_scores(&current_player);
+            printf("🏆 New personal best!\n");
+        }
+    } else {
+        printf("\n❌ Invalid path! You hit a wall or didn't reach the end.\n");
+        display_maze(maze);
+    }
+    
+    pause_screen();
+}
 
 
 /*
