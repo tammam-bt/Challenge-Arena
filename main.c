@@ -745,6 +745,116 @@ void challenge_course_robots() {
 
 /*
 ================================================================================
+    CHALLENGE 4: TRI ULTIME
+    Sort an array with limited operations
+================================================================================
+*/
+
+void challenge_tri_ultime() {
+    clear_screen();
+    display_header("CHALLENGE 4: Tri Ultime");
+    
+    printf("🎯 Objective: Sort the array using swap operations\n");
+    printf("   Minimize the number of swaps!\n\n");
+    
+    // Generate random array
+    int arr[8];
+    int n = 8;
+    int used[90] = {0}; // Track used numbers (10-99)
+    
+    for(int i = 0; i < n; i++) {
+        int num;
+        do {
+            num = (rand() % 90) + 10; // 10-99
+        } while(used[num - 10]);
+        used[num - 10] = 1;
+        arr[i] = num;
+    }
+    
+    printf("Initial array: ");
+    for(int i = 0; i < n; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n\n");
+    
+    printf("Enter swap operations (format: index1 index2, e.g., 0 1)\n");
+    printf("Type 'done' when finished, 'skip' to skip\n\n");
+    
+    int swaps = 0;
+    char input[100];
+    
+    while(1) {
+        printf("Current array: ");
+        for(int i = 0; i < n; i++) {
+            printf("%d ", arr[i]);
+        }
+        printf("\n");
+        
+        printf("Swap (or 'done'/'skip'): ");
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input, "\n")] = 0;
+        
+        if (strcmp(input, "done") == 0) break;
+        if (strcmp(input, "skip") == 0) {
+            printf("\n❌ Challenge skipped!\n");
+            pause_screen();
+            return;
+        }
+        
+        int idx1, idx2;
+        if (sscanf(input, "%d %d", &idx1, &idx2) == 2) {
+            if (idx1 >= 0 && idx1 < n && idx2 >= 0 && idx2 < n) {
+                int temp = arr[idx1];
+                arr[idx1] = arr[idx2];
+                arr[idx2] = temp;
+                swaps++;
+            } else {
+                printf("❌ Invalid indices!\n");
+            }
+        } else {
+            printf("❌ Invalid format!\n");
+        }
+    }
+    
+    // Check if sorted
+    int sorted = 1;
+    for(int i = 0; i < n - 1; i++) {
+        if (arr[i] > arr[i+1]) {
+            sorted = 0;
+            break;
+        }
+    }
+    
+    if (sorted) {
+        // Score based on number of swaps (fewer is better)
+        // Use difficulty-based scoring: fewer swaps = higher score
+        int score = POINTS_TRI - (swaps / 2);
+        if (score < 5) score = 5;
+        
+        printf("\n✅ Array sorted successfully!\n");
+        printf("🎯 Number of swaps: %d\n", swaps);
+        printf("🎯 Score earned: %d points\n", score);
+        
+        if (current_player.tri_score == 0) {
+            current_player.challenges_completed++;
+        }
+        
+        if (score > current_player.tri_score) {
+            current_player.total_score = current_player.total_score - current_player.tri_score + score;
+            current_player.tri_score = score;
+            save_player_scores(&current_player);
+            printf("🏆 New personal best!\n");
+        }
+    } else {
+        printf("\n❌ Array is not sorted correctly!\n");
+    }
+    
+    pause_screen();
+}
+
+
+/*
+================================================================================
     MAIN FUNCTION
 ================================================================================
 */
