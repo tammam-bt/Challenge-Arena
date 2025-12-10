@@ -1,0 +1,32 @@
+# Compiled object files
+*.o
+
+# Compiled dynamic libraries
+*.so
+
+# Compiled static libraries
+*.a
+
+# Executable files
+*.out
+*.exe
+
+# Debug files
+*.dSYM/
+*.stackdump
+
+# IDE specific files
+.vscode/
+*.code-workspace
+
+# Backup files
+*~
+*.bak
+
+# Logs
+*.log
+
+# Dependency directories
+node_modules/
+build/
+dist/
