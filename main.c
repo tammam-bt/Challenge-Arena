@@ -855,6 +855,149 @@ void challenge_tri_ultime() {
 
 /*
 ================================================================================
+    CHALLENGE 5: TOUR DE HANOI
+    Solve the Tower of Hanoi puzzle
+================================================================================
+*/
+
+void display_hanoi_state(int towers[3][10], int counts[3], int disks) {
+    printf("\n");
+    for(int level = disks - 1; level >= 0; level--) {
+        printf("  ");
+        for(int tower = 0; tower < 3; tower++) {
+            if (counts[tower] > level) {
+                int disk = towers[tower][level];
+                for(int i = 0; i < disk; i++) printf("█");
+                for(int i = disk; i < disks; i++) printf(" ");
+            } else {
+                for(int i = 0; i < disks; i++) printf(" ");
+            }
+            printf("  ");
+        }
+        printf("\n");
+    }
+    printf("  ");
+    for(int i = 0; i < disks; i++) printf("═");
+    printf("  ");
+    for(int i = 0; i < disks; i++) printf("═");
+    printf("  ");
+    for(int i = 0; i < disks; i++) printf("═");
+    printf("\n");
+    printf("     A");
+    for(int i = 0; i < disks - 1; i++) printf(" ");
+    printf("    B");
+    for(int i = 0; i < disks - 1; i++) printf(" ");
+    printf("    C\n");
+}
+
+void challenge_tour_hanoi() {
+    clear_screen();
+    display_header("CHALLENGE 5: Tour de Hanoi");
+    
+    printf("🎯 Objective: Move all disks from tower A to tower C\n");
+    printf("   Rules:\n");
+    printf("   • Only one disk can be moved at a time\n");
+    printf("   • A larger disk cannot be placed on a smaller disk\n\n");
+    
+    // Randomize number of disks (3-5)
+    int disks = (rand() % 3) + 3;
+    int towers[3][10] = {0};
+    int counts[3] = {disks, 0, 0};
+    
+    // Initialize tower A with disks (largest to smallest)
+    for(int i = 0; i < disks; i++) {
+        towers[0][i] = disks - i;
+    }
+    
+    display_hanoi_state(towers, counts, disks);
+    
+    int moves = 0;
+    int min_moves = (1 << disks) - 1; // 2^n - 1
+    
+    printf("\nMinimum possible moves: %d\n", min_moves);
+    printf("\nEnter moves (format: A B to move from tower A to B)\n");
+    printf("Type 'skip' to skip\n\n");
+    
+    while(1) {
+        if (counts[2] == disks) {
+            // Win condition
+            printf("\n✅ Congratulations! You solved the Tower of Hanoi!\n");
+            
+            // Score based on number of moves
+            int score = POINTS_HANOI - (moves - min_moves) * 2;
+            if (score < 10) score = 10;
+            
+            printf("🎯 Moves used: %d (optimal: %d)\n", moves, min_moves);
+            printf("🎯 Score earned: %d points\n", score);
+            
+            if (current_player.hanoi_score == 0) {
+                current_player.challenges_completed++;
+            }
+            
+            if (score > current_player.hanoi_score) {
+                current_player.total_score = current_player.total_score - current_player.hanoi_score + score;
+                current_player.hanoi_score = score;
+                save_player_scores(&current_player);
+                printf("🏆 New personal best!\n");
+            }
+            break;
+        }
+        
+        printf("Move: ");
+        char input[10];
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input, "\n")] = 0;
+        
+        if (strcmp(input, "skip") == 0) {
+            printf("\n❌ Challenge skipped!\n");
+            pause_screen();
+            return;
+        }
+        
+        char from, to;
+        if (sscanf(input, "%c %c", &from, &to) == 2) {
+            from = toupper(from);
+            to = toupper(to);
+            
+            int from_idx = from - 'A';
+            int to_idx = to - 'A';
+            
+            if (from_idx < 0 || from_idx > 2 || to_idx < 0 || to_idx > 2) {
+                printf("❌ Invalid towers! Use A, B, or C.\n");
+                continue;
+            }
+            
+            if (counts[from_idx] == 0) {
+                printf("❌ Source tower is empty!\n");
+                continue;
+            }
+            
+            int disk = towers[from_idx][counts[from_idx] - 1];
+            
+            if (counts[to_idx] > 0 && towers[to_idx][counts[to_idx] - 1] < disk) {
+                printf("❌ Cannot place larger disk on smaller disk!\n");
+                continue;
+            }
+            
+            // Valid move
+            towers[from_idx][counts[from_idx] - 1] = 0;
+            counts[from_idx]--;
+            towers[to_idx][counts[to_idx]] = disk;
+            counts[to_idx]++;
+            moves++;
+            
+            display_hanoi_state(towers, counts, disks);
+        } else {
+            printf("❌ Invalid format! Use: A B\n");
+        }
+    }
+    
+    pause_screen();
+}
+
+
+/*
+================================================================================
     MAIN FUNCTION
 ================================================================================
 */
