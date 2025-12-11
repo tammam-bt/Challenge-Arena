@@ -1085,21 +1085,21 @@ void display_main_menu() {
     clear_screen();
     display_banner();
     
-    printf("  ╔═══════════════════════════════════════════════════════════════════╗\n");
-    printf("  ║                         🎮 MAIN MENU 🎮                           ║\n");
-    printf("  ╠═══════════════════════════════════════════════════════════════════╣\n");
-    printf("  ║                                                                   ║\n");
-    printf("  ║   1. 🎯 Le Compte est Bon              (Difficulty: ⭐⭐⭐ - 30pts)  ║\n");
-    printf("  ║   2. 🧩 Mastermind Algorithmique       (Difficulty: ⭐⭐⭐ - 25pts)  ║\n");
+    printf("  ╔═══════════════════════════════════════════════════════════════════════════╗\n");
+    printf("  ║                         🎮 MAIN MENU 🎮                                  ║\n");
+    printf("  ╠═══════════════════════════════════════════════════════════════════════════╣\n");
+    printf("  ║                                                                           ║\n");
+    printf("  ║   1. 🎯 Le Compte est Bon              (Difficulty: ⭐⭐⭐ - 30pts)     ║\n");
+    printf("  ║   2. 🧩 Mastermind Algorithmique       (Difficulty: ⭐⭐⭐ - 25pts)     ║\n");
     printf("  ║   3. 🤖 Course de Robots               (Difficulty: ⭐⭐⭐⭐⭐ - 50pts)║\n");
-    printf("  ║   4. 📊 Tri Ultime                     (Difficulty: ⭐⭐ - 20pts)    ║\n");
-    printf("  ║   5. 🗼 Tour de Hanoi                  (Difficulty: ⭐⭐⭐⭐ - 40pts)  ║\n");
-    printf("  ║                                                                   ║\n");
-    printf("  ║   6. 🏆 View Leaderboard                                          ║\n");
-    printf("  ║   7. 📊 View Your Statistics                                      ║\n");
-    printf("  ║   8. 🚪 Exit                                                      ║\n");
-    printf("  ║                                                                   ║\n");
-    printf("  ╚═══════════════════════════════════════════════════════════════════╝\n\n");
+    printf("  ║   4. 📊 Tri Ultime                     (Difficulty: ⭐⭐ - 20pts)        ║\n");
+    printf("  ║   5. 🗼 Tour de Hanoi                  (Difficulty: ⭐⭐⭐⭐ - 40pts)   ║\n");
+    printf("  ║                                                                            ║\n");
+    printf("  ║   6. 🏆 View Leaderboard                                                  ║\n");
+    printf("  ║   7. 📊 View Your Statistics                                              ║\n");
+    printf("  ║   8. 🚪 Exit                                                              ║\n");
+    printf("  ║                                                                           ║\n");
+    printf("  ╚═══════════════════════════════════════════════════════════════════════════╝\n\n");
     
     printf("  Player: %s | Total Score: %d | Completed: %d/5\n\n",
            current_player.name, current_player.total_score, current_player.challenges_completed);
